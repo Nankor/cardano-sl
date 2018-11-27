@@ -108,7 +108,7 @@ let
     nix-tools.tests = removeAttrs
       (lib.mapAttrs (_: lib.mapAttrs (_: _: supportedSystems))
         (lib.filterAttrs (n: v: builtins.match ".*cardano-sl.*" n != null && v != null)
-          nix-tools.tests))
+          iohkPkgs.nix-tools.tests))
       skipPackages;
 
   };
