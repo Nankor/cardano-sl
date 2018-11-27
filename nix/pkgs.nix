@@ -12,6 +12,9 @@ let
      default;
 in
 let
+  # save the nixpkgs value in pkgs'
+  # so we can work with `pkgs` provided by modules.
+  pkgs' = pkgs;
   # all packages from hackage as nix expressions
   hackage = import (overrideWith "hackage"
                     (pkgs.fetchFromGitHub { owner  = "angerman";
@@ -132,7 +135,7 @@ let
           kill $RISERV_PID
         '';
         withTH = { setupBuildFlags = buildFlags; inherit preBuild postBuild; };
-        in {
+        in lib.optionalAttrs pkgs'.stdenv.hostPlatform.isWindows  {
          packages.generics-sop      = withTH;
          packages.ether             = withTH;
          packages.th-lift-instances = withTH;
@@ -164,6 +167,7 @@ let
          packages.servant-swagger-ui-redoc = withTH;
          packages.cardano-sl-wallet-new = withTH;
          packages.cardano-sl-tools    = withTH;
+         packages.cardano-sl-generator = withTH;
          packages.trifecta            = withTH;
       })
       # packages we wish to ignore version bounds of.
