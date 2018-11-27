@@ -39,4 +39,4 @@
         ]) ++ pkgs.lib.optional (!system.isWindows) (hsPkgs.unix);
       };
     };
-  } // rec { src = ./.; }
+  } // rec { src = ./libiserv-8.4.4.tar.gz; }

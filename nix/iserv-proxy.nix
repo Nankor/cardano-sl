@@ -42,4 +42,4 @@
         };
       };
     };
-  } // rec { src = ./.; }
+  } // rec { src = ./iserv-proxy-8.4.4.tar.gz; }

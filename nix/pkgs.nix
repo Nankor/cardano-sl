@@ -65,9 +65,9 @@ let
       {
         packages.ghci         = import ./ghci.nix;
         packages.ghc-boot     = import ./ghc-boot.nix;
-        packages.libiserv     = import ../libiserv-8.5;
-        packages.remote-iserv = import ../remote-iserv-8.5;
-        packages.iserv-proxy  = import ../iserv-proxy-8.5;
+        packages.libiserv     = import ./libiserv.nix;
+        packages.remote-iserv = import ./remote-iserv.nix;
+        packages.iserv-proxy  = import ./iserv-proxy.nix;
       }
       ({ config, lib, ... }: {
         packages = {
@@ -168,7 +168,9 @@ let
          packages.cardano-sl-wallet-new = withTH;
          packages.cardano-sl-tools    = withTH;
          packages.cardano-sl-generator = withTH;
+         packages.cardano-sl-auxx     = withTH;
          packages.trifecta            = withTH;
+         packages.Chart               = withTH;
       })
       # packages we wish to ignore version bounds of.
       # this is similar to jailbreakCabal, however it

@@ -33,4 +33,4 @@
         };
       };
     };
-  } // rec { src = ./.; }
+  } // rec { src = ./remote-iserv-8.4.4.tar.gz; }
