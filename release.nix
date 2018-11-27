@@ -95,7 +95,7 @@ let
       cardano-sl-wallet-new = supportedSystems;
       cardano-sl-x509       = supportedSystems;
     } skipPackages;
-    nixtools.exes = removeAttrs {
+    nix-tools.exes = removeAttrs {
       # nix-tools toolchain: Executables
       # these will usually implicitly build their
       # library as they depend on it.
