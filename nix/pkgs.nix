@@ -171,6 +171,7 @@ let
          packages.cardano-sl-auxx     = withTH;
          packages.trifecta            = withTH;
          packages.Chart               = withTH;
+         packages.active              = withTH;
       })
       # packages we wish to ignore version bounds of.
       # this is similar to jailbreakCabal, however it

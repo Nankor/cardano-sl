@@ -300,7 +300,11 @@ let
       // { exes = mapAttrs (k: v: if   length (attrValues v.components.exes) > 0
                                   then (if pkgs.stdenv.targetPlatform.isWindows then pkgs.copyJoin else pkgs.symlinkJoin)
                                        { name = "${k}-exes"; paths = attrValues v.components.exes; }
-                                  else null) nix-tools; };
+                                  else null) nix-tools; }
+      // { tests = mapAttrs (k: v: if length (attrValues v.components.tests) > 0
+                                   then v.components.tests
+                                   else null) nix-tools; }
+      ;
   })
   );
 

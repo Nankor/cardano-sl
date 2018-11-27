@@ -78,33 +78,41 @@ let
   } skipPackages;
   mapped = mapTestOn platforms;
 
-  nix-tools-toolchain = removeAttrs {
-    # nix-tools toolchain: Libraries
-    nix-tools.libs.cardano-sl            = supportedSystems;
-    nix-tools.libs.cardano-sl-auxx       = supportedSystems;
-    nix-tools.libs.cardano-sl-chain      = supportedSystems;
-    nix-tools.libs.cardano-sl-core       = supportedSystems;
-    nix-tools.libs.cardano-sl-crypto     = supportedSystems;
-    nix-tools.libs.cardano-sl-db         = supportedSystems;
-    nix-tools.libs.cardano-sl-generator  = supportedSystems;
-    nix-tools.libs.cardano-sl-infra      = supportedSystems;
-    nix-tools.libs.cardano-sl-networking = supportedSystems;
-    nix-tools.libs.cardano-sl-tools      = supportedSystems;
-    nix-tools.libs.cardano-sl-util       = supportedSystems;
-    nix-tools.libs.cardano-sl-wallet-new = supportedSystems;
-    nix-tools.libs.cardano-sl-x509       = supportedSystems;
-
-    # nix-tools toolchain: Executables
-    # these will usually implicitly build their
-    # library as they depend on it.
-    nix-tools.exes.cardano-sl-tools             = supportedSystems;
-    nix-tools.exes.cardano-sl-generator         = supportedSystems;
-    nix-tools.exes.cardano-sl-tools-post-mortem = supportedSystems;
-    nix-tools.exes.cardano-sl-wallet-new        = supportedSystems;
-
+  nix-tools-toolchain = {
+    nix-tools.libs = removeAttrs {
+      # nix-tools toolchain: Libraries
+      cardano-sl            = supportedSystems;
+      cardano-sl-auxx       = supportedSystems;
+      cardano-sl-chain      = supportedSystems;
+      cardano-sl-core       = supportedSystems;
+      cardano-sl-crypto     = supportedSystems;
+      cardano-sl-db         = supportedSystems;
+      cardano-sl-generator  = supportedSystems;
+      cardano-sl-infra      = supportedSystems;
+      cardano-sl-networking = supportedSystems;
+      cardano-sl-tools      = supportedSystems;
+      cardano-sl-util       = supportedSystems;
+      cardano-sl-wallet-new = supportedSystems;
+      cardano-sl-x509       = supportedSystems;
+    } skipPackages;
+    nixtools.exes = removeAttrs {
+      # nix-tools toolchain: Executables
+      # these will usually implicitly build their
+      # library as they depend on it.
+      cardano-sl-tools             = supportedSystems;
+      cardano-sl-generator         = supportedSystems;
+      cardano-sl-tools-post-mortem = supportedSystems;
+      cardano-sl-wallet-new        = supportedSystems;
+    } skipPackages;
     # nix-tools toolchain: Tests
-    # TBD
-  } skipPackages;
+    nix-tools.tests = removeAttrs
+      (lib.mapAttrs (_: lib.mapAttrs (_: _: supportedSystems))
+        (lib.filterAttrs (n: v: builtins.match ".*cardano-sl.*" n != null && v != null)
+          nix-tools.tests))
+      skipPackages;
+
+  };
+
   mapped-nix-tools       = mapTestOn                                    nix-tools-toolchain;
   mapped-nix-tools-cross = mapTestOnCross lib.systems.examples.mingwW64 nix-tools-toolchain;
 
