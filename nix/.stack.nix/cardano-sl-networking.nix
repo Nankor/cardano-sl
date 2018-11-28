@@ -162,6 +162,9 @@
             (hsPkgs.stm)
             (hsPkgs.time-units)
           ];
+          build-tools = [
+            (hsPkgs.buildPackages.hspec-discover)
+          ];
         };
       };
       benchmarks = {
