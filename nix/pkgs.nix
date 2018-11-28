@@ -172,6 +172,7 @@ let
          packages.trifecta            = withTH;
          packages.Chart               = withTH;
          packages.active              = withTH;
+         packages.cardano-sl-faucet   = withTH;
       })
       # packages we wish to ignore version bounds of.
       # this is similar to jailbreakCabal, however it
@@ -179,6 +180,14 @@ let
       {
          packages.katip.components.library.doExactConfig         = true;
          packages.serokell-util.components.library.doExactConfig = true;
+      }
+      # nix-tools related fixes (TODOs for nix-tools)
+      {
+         # apparently if we use a package from stackage, with a revision
+         # number and then replace that with out override logic, we
+         # still end up with the revision from stackage, no matter if the
+         # package we replaced even has that revision. O_O
+         packages.network-transport-inmemory.revision = 0;
       }
     ];
   };
