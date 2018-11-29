@@ -148,31 +148,35 @@ let
          packages.swagger2          = withTH;
          packages.wreq              = withTH;
          packages.wai-app-static    = withTH;
+         packages.log-warper        = withTH;
          packages.cardano-sl-util   = withTH;
          packages.cardano-sl-crypto = withTH;
          packages.cardano-sl-crypto-test = withTH;
-         packages.log-warper        = withTH;
          packages.cardano-sl-core   = withTH;
          packages.cardano-sl        = withTH;
          packages.cardano-sl-chain  = withTH;
          packages.cardano-sl-db     = withTH;
          packages.cardano-sl-networking = withTH;
          packages.cardano-sl-infra  = withTH;
+         packages.cardano-sl-infra-test = withTH;
          packages.cardano-sl-client = withTH;
          packages.cardano-sl-core-test = withTH;
          packages.cardano-sl-chain-test = withTH;
          packages.cardano-sl-utxo   = withTH;
-         packages.math-functions    = withTH;
-         packages.servant-swagger-ui = withTH;
-         packages.servant-swagger-ui-redoc = withTH;
          packages.cardano-sl-wallet-new = withTH;
          packages.cardano-sl-tools    = withTH;
          packages.cardano-sl-generator = withTH;
          packages.cardano-sl-auxx     = withTH;
+         packages.cardano-sl-faucet   = withTH;
+         packages.cardano-sl-binary   = withTH;
+         packages.cardano-sl-node     = withTH;
+         packages.math-functions    = withTH;
+         packages.servant-swagger-ui = withTH;
+         packages.servant-swagger-ui-redoc = withTH;
          packages.trifecta            = withTH;
          packages.Chart               = withTH;
          packages.active              = withTH;
-         packages.cardano-sl-faucet   = withTH;
+         packages.diagrams            = withTH;
       })
       # packages we wish to ignore version bounds of.
       # this is similar to jailbreakCabal, however it
@@ -181,6 +185,14 @@ let
          packages.katip.components.library.doExactConfig         = true;
          packages.serokell-util.components.library.doExactConfig = true;
       }
+      ({ pkgs, ... }: {
+         # ???: Why do I ned CoreServices to be part of the `libs`? It's a
+         #      Framework after all.  This is quite confusing to me.
+         packages.hfsevents.components.library.frameworks  = [ pkgs.CoreServices ];
+#         packages.hfsevents.components.library.build-tools = [ pkgs.CoreServices ];
+         packages.hfsevents.components.library.configureFlags = [ "-v" "--ghc-option=-v3" ];
+         packages.hfsevents.components.library.setupBuildFlags = [ "-v" ];
+      })
       # nix-tools related fixes (TODOs for nix-tools)
       {
          # apparently if we use a package from stackage, with a revision
