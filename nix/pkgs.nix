@@ -27,8 +27,8 @@ let
   haskell = import (overrideWith "haskell"
                     (pkgs.fetchFromGitHub { owner  = "angerman";
                                             repo   = "haskell.nix";
-                                            rev    = "a3122dd1e1bee134c8a5a30af2a0e5eaaaf8e94f";
-                                            sha256 = "0ib1bxz341di2kxi526b3cmps8y3x5hadahgp8lh4l1405xr1icz";
+                                            rev    = "5f56d93147ab0ff0c9798ca760569038fa632b18";
+                                            sha256 = "0qaj984dfd8hc557z7j650699k2vk74bsf65qbimy69jdb8kl13l";
                                             name   = "haskell-lib-source"; }))
                    hackage;
 
@@ -54,30 +54,30 @@ let
   pkgSet = haskell.mkNewPkgSet {
     inherit pkgs;
     pkg-def = stackage.${stack-pkgs.resolver};
-    modules = [
-      stack-pkgs.module
+    pkg-def-overlays = [
+      stack-pkgs.overlay
       # We use some customized libiserv/remote-iserv/iserv-proxy
       # instead of the ones provided by ghc. This is mostly due
       # to being able to hack on them freely as needed.
       #
       # iserv is only relevant for template-haskell execution in
       # a cross compiling setup.
-      {
-        packages.ghci         = import ./ghci.nix;
-        packages.ghc-boot     = import ./ghc-boot.nix;
-        packages.libiserv     = import ./libiserv.nix;
-        packages.remote-iserv = import ./remote-iserv.nix;
-        packages.iserv-proxy  = import ./iserv-proxy.nix;
-      }
-      ({ config, lib, ... }: {
-        packages = {
-          hsc2hs = config.hackage.configs.hsc2hs."0.68.4".revisions.default;
-          # stackage 12.17 beautifully omitts the Win32 pkg
-          Win32 = config.hackage.configs.Win32."2.6.2.0".revisions.default;
-        };
+      (_: {
+        packages.ghci.revision         = import ./ghci.nix;
+        packages.ghc-boot.revision     = import ./ghc-boot.nix;
+        packages.libiserv.revision     = import ./libiserv.nix;
+        packages.remote-iserv.revision = import ./remote-iserv.nix;
+        packages.iserv-proxy.revision  = import ./iserv-proxy.nix;
       })
+      (hackage: {
+          packages.hsc2hs.revision = hackage.hsc2hs."0.68.4".revisions.default;
+          # stackage 12.17 beautifully omitts the Win32 pkg
+          packages.Win32.revision = hackage.Win32."2.6.2.0".revisions.default;
+      })
+    ];
+    modules = [
       {
-               # This needs true, otherwise we miss most of the interesting
+         # This needs true, otherwise we miss most of the interesting
          # modules.
          packages.ghci.flags.ghci = true;
          # this needs to be true to expose module
@@ -177,6 +177,10 @@ let
          packages.Chart               = withTH;
          packages.active              = withTH;
          packages.diagrams            = withTH;
+         packages.diagrams-lib        = withTH;
+         packages.diagrams-svg        = withTH;
+         packages.diagrams-postscript = withTH;
+         packages.Chart-diagrams      = withTH;
       })
       # packages we wish to ignore version bounds of.
       # this is similar to jailbreakCabal, however it
@@ -193,14 +197,6 @@ let
          packages.hfsevents.components.library.configureFlags = [ "-v" "--ghc-option=-v3" ];
          packages.hfsevents.components.library.setupBuildFlags = [ "-v" ];
       })
-      # nix-tools related fixes (TODOs for nix-tools)
-      {
-         # apparently if we use a package from stackage, with a revision
-         # number and then replace that with out override logic, we
-         # still end up with the revision from stackage, no matter if the
-         # package we replaced even has that revision. O_O
-         packages.network-transport-inmemory.revision = 0;
-      }
     ];
   };
 
