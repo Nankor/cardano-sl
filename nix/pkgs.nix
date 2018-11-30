@@ -27,8 +27,8 @@ let
   haskell = import (overrideWith "haskell"
                     (pkgs.fetchFromGitHub { owner  = "angerman";
                                             repo   = "haskell.nix";
-                                            rev    = "87bb046688a8f36a2351bd9a0ae967a24728a9e6";
-                                            sha256 = "1blz9zry49jgg84c7j6xgmhmlbnd5xh5qfg5gwi58d8jibc4298i";
+                                            rev    = "2a3b2612a15fd7f14d32c3519aba2b64bd7b1e43";
+                                            sha256 = "181dv1zlf381kkb82snjmpibhgmkyw1n5qsvpqjrv8dxmcjqjl2k";
                                             name   = "haskell-lib-source"; }))
                    hackage;
 
@@ -62,18 +62,18 @@ let
       #
       # iserv is only relevant for template-haskell execution in
       # a cross compiling setup.
-      (_: {
-        packages.ghci.revision         = import ./ghci.nix;
-        packages.ghc-boot.revision     = import ./ghc-boot.nix;
-        packages.libiserv.revision     = import ./libiserv.nix;
-        packages.remote-iserv.revision = import ./remote-iserv.nix;
-        packages.iserv-proxy.revision  = import ./iserv-proxy.nix;
+      {
+        ghci         = ./ghci.nix;
+        ghc-boot     = ./ghc-boot.nix;
+        libiserv     = ./libiserv.nix;
+        remote-iserv = ./remote-iserv.nix;
+        iserv-proxy  = ./iserv-proxy.nix;
 #        packages.hfsevents.revision = import ../hfsevents-0.1.6;
-      })
+      }
       (hackage: {
-          packages.hsc2hs.revision = hackage.hsc2hs."0.68.4".revisions.default;
+          hsc2hs = hackage.hsc2hs."0.68.4".revisions.default;
           # stackage 12.17 beautifully omitts the Win32 pkg
-          packages.Win32.revision = hackage.Win32."2.6.2.0".revisions.default;
+          Win32 = hackage.Win32."2.6.2.0".revisions.default;
       })
     ];
     modules = [
