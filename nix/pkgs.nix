@@ -27,8 +27,8 @@ let
   haskell = import (overrideWith "haskell"
                     (pkgs.fetchFromGitHub { owner  = "angerman";
                                             repo   = "haskell.nix";
-                                            rev    = "5f56d93147ab0ff0c9798ca760569038fa632b18";
-                                            sha256 = "0qaj984dfd8hc557z7j650699k2vk74bsf65qbimy69jdb8kl13l";
+                                            rev    = "9c0b4722ee6f699366285b4a3b072dc2b8c37d3d";
+                                            sha256 = "0q6rsvb885mvy9n4bplk1wdqwpam69xd3q6vvazp6s1d8fasfk0v";
                                             name   = "haskell-lib-source"; }))
                    hackage;
 
