@@ -27,8 +27,8 @@ let
   haskell = import (overrideWith "haskell"
                     (pkgs.fetchFromGitHub { owner  = "angerman";
                                             repo   = "haskell.nix";
-                                            rev    = "9c0b4722ee6f699366285b4a3b072dc2b8c37d3d";
-                                            sha256 = "0q6rsvb885mvy9n4bplk1wdqwpam69xd3q6vvazp6s1d8fasfk0v";
+                                            rev    = "34bf8d224a00ac7e4ac676793ee737739fbd26bf";
+                                            sha256 = "1wc0aq7az0vva1ls4ip3zaf8s5hhw35wvsp68mb2bhq14cv9wakn";
                                             name   = "haskell-lib-source"; }))
                    hackage;
 
@@ -68,6 +68,7 @@ let
         packages.libiserv.revision     = import ./libiserv.nix;
         packages.remote-iserv.revision = import ./remote-iserv.nix;
         packages.iserv-proxy.revision  = import ./iserv-proxy.nix;
+#        packages.hfsevents.revision = import ../hfsevents-0.1.6;
       })
       (hackage: {
           packages.hsc2hs.revision = hackage.hsc2hs."0.68.4".revisions.default;
@@ -134,7 +135,35 @@ let
           echo "---> killing remote-iserv..."
           kill $RISERV_PID
         '';
-        withTH = { setupBuildFlags = buildFlags; inherit preBuild postBuild; };
+
+        testFlags = [ "--test-wrapper ${wineTestWrapper}/bin/test-wrapper" ];
+        wineTestWrapper = pkgs'.writeScriptBin "test-wrapper" ''
+          #!${pkgs'.stdenv.shell}
+          set -euo pipefail
+          WINEDLLOVERRIDES="winemac.drv=d" WINEDEBUG=-all+error LC_ALL=en_US.UTF-8 WINEPREFIX=$TMP ${pkgs.buildPackages.winePackages.minimal}/bin/wine64 $@*
+        '';
+        preCheck = ''
+          echo "================================================================================"
+          echo "RUNNING TESTS for $name via wine64"
+          echo "================================================================================"
+          # copy all .dlls into the local directory.
+          # we ask ghc-pkg for *all* dynamic-library-dirs and then iterate over the unique set
+          # to copy over dlls as needed.
+          for libdir in $(ghc-pkg --package-db=$packageConfDir field "*" dynamic-library-dirs --simple-output|xargs|sed 's/ /\n/g'|sort -u); do
+            if [ -d "$libdir" ]; then
+              for lib in "$libdir"/*.{DLL,dll}; do
+                cp "$lib" .
+              done
+            fi
+          done
+        '';
+        postCheck = ''
+          echo "================================================================================"
+          echo "END RUNNING TESTS"
+          echo "================================================================================"
+        '';
+        withTH = { setupBuildFlags = buildFlags; setupTestFlags = testFlags;
+                   inherit preBuild postBuild preCheck postCheck; };
         in lib.optionalAttrs pkgs'.stdenv.hostPlatform.isWindows  {
          packages.generics-sop      = withTH;
          packages.ether             = withTH;
@@ -170,6 +199,7 @@ let
          packages.cardano-sl-faucet   = withTH;
          packages.cardano-sl-binary   = withTH;
          packages.cardano-sl-node     = withTH;
+         packages.cardano-sl-explorer = withTH;
          packages.math-functions    = withTH;
          packages.servant-swagger-ui = withTH;
          packages.servant-swagger-ui-redoc = withTH;
@@ -194,8 +224,8 @@ let
          #      Framework after all.  This is quite confusing to me.
          packages.hfsevents.components.library.frameworks  = [ pkgs.CoreServices ];
 #         packages.hfsevents.components.library.build-tools = [ pkgs.CoreServices ];
-         packages.hfsevents.components.library.configureFlags = [ "-v" "--ghc-option=-v3" ];
-         packages.hfsevents.components.library.setupBuildFlags = [ "-v" ];
+#         packages.hfsevents.components.library.configureFlags = [ "-v" "--ghc-option=-v3" ];
+#         packages.hfsevents.components.library.setupBuildFlags = [ "-v" ];
       })
     ];
   };
